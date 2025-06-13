@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>DOUCEUR™ - Site officiel</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', cursive;
+      background-image: url('https://i.gifer.com/H5z.gif');
+      background-size: cover;
+      color: #fff;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 64px;
+      font-weight: bold;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      position: relative;
+      margin-top: 40px;
+    }
+
+    .logo::after {
+      content: "™";
+      font-size: 18px;
+      position: absolute;
+      top: -10px;
+      right: -25px;
+      color: white;
+    }
+
+    .welcome-message {
+      font-size: 24px;
+      margin-top: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      display: inline-block;
+      border: 2px dashed pink;
+      margin-bottom: 20px;
+    }
+
+    .gif-container img {
+      width: 200px;
+      margin: 10px;
+      border: 4px double magenta;
+    }
+
+    audio {
+      margin-top: 20px;
+    }
+
+    #cookie-banner, #cookie-preferences {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(255, 192, 203, 0.95);
+      border-top: 4px dashed magenta;
+      padding: 20px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Comic Sans MS', cursive;
+      color: black;
+      z-index: 1000;
+    }
+
+    .cookie-buttons button {
+      margin-left: 10px;
+      padding: 10px 15px;
+      border: 2px solid purple;
+      border-radius: 10px;
+      background-color: yellow;
+      color: red;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .cookie-buttons button:hover {
+      background-color: orange;
+      transform: scale(1.1);
+    }
+
+    #game-board {
+      margin: 40px auto;
+      max-width: 600px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .card {
+      background-color: white;
+      color: black;
+      font-size: 24px;
+      border-radius: 10px;
+      padding: 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">DOUCEUR</div>
+  <div class="welcome-message">Bienvenue aux douceurs qui correspondent au RGPD 💖🍪</div>
+
+  <div class="gif-container">
+    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="chat rigolo">
+    <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif" alt="chat scintillant">
+    <img src="https://media.giphy.com/media/13borq7Zo2kulO/giphy.gif" alt="chat arc-en-ciel">
+  </div>
+
+  <audio controls autoplay loop>
+    <source src="audio/audiofile.mp3" type="audio/mpeg">
+    Votre navigateur ne supporte pas l'audio.
+  </audio>
+
+  <div id="game-board"></div>
+
+  <div id="cookie-banner">
+    <p>🌈 Salut ! On utilise des cookies pour améliorer ton expérience. Accepte-les ou personnalise tes choix !</p>
+    <div class="cookie-buttons">
+      <button onclick="setCookieConsent('accepted')">🍪 Accepter</button>
+      <button onclick="setCookieConsent('refused')">🙅‍♀️ Refuser</button>
+      <button onclick="document.getElementById('cookie-preferences').style.display = 'flex'">🔧 Personnaliser</button>
+    </div>
+  </div>
+
+  <div id="cookie-preferences">
+    <p><strong>Préférences cookies :</strong></p>
+    <ul>
+      <li><input type="checkbox" checked disabled> Cookies nécessaires (toujours actifs)</li>
+      <li><input type="checkbox" id="analytics"> Cookies de mesure d’audience</li>
+      <li><input type="checkbox" id="ads"> Cookies publicitaires</li>
+      <li><input type="checkbox" id="social"> Cookies de réseaux sociaux</li>
+    </ul>
+    <div class="cookie-buttons">
+      <button onclick="savePreferences()">Enregistrer</button>
+      <button onclick="document.getElementById('cookie-preferences').style.display = 'none'">Fermer</button>
+    </div>
+  </div>
+
+  <script>
+    const banner = document.getElementById('cookie-banner');
+    const preferences = document.getElementById('cookie-preferences');
+
+    function setCookieConsent(value) {
+      localStorage.setItem('cookie_consent', value);
+      banner.style.display = 'none';
+    }
+
+    function savePreferences() {
+      const settings = {
+        analytics: document.getElementById('analytics').checked,
+        ads: document.getElementById('ads').checked,
+        social: document.getElementById('social').checked
+      };
+      localStorage.setItem('cookie_preferences', JSON.stringify(settings));
+      preferences.style.display = 'none';
+      banner.style.display = 'none';
+    }
+
+    if (!localStorage.getItem('cookie_consent') && !localStorage.getItem('cookie_preferences')) {
+      banner.style.display = 'flex';
+    }
+
+    // Jeu de mémoire : trouver les paires
+    const board = document.getElementById('game-board');
+    let numbers = [];
+    while (numbers.length < 5) {
+      const rand = Math.floor(Math.random() * 100) + 1;
+      if (!numbers.includes(rand)) numbers.push(rand);
+    }
+    const cards = [...numbers, ...numbers]
+      .sort(() => Math.random() - 0.5)
+      .map((n, i) => ({ id: i, number: n, revealed: false, matched: false }));
+
+    let firstCard = null;
+    let secondCard = null;
+    let matchedCount = 0;
+
+    function renderBoard() {
+      board.innerHTML = '';
+      cards.forEach(card => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerText = card.revealed || card.matched ? card.number : '?';
+        div.onclick = () => onCardClick(card);
+        board.appendChild(div);
+      });
+    }
+
+    function onCardClick(card) {
+      if (card.revealed || card.matched || secondCard) return;
+      card.revealed = true;
+      if (!firstCard) {
+        firstCard = card;
+      } else {
+        secondCard = card;
+        if (firstCard.number === secondCard.number) {
+          firstCard.matched = secondCard.matched = true;
+          matchedCount++;
+          firstCard = secondCard = null;
+          if (matchedCount === 5) alert('🎉 Bravo ! Toutes les paires sont trouvées !');
+        } else {
+          setTimeout(() => {
+            firstCard.revealed = secondCard.revealed = false;
+            firstCard = secondCard = null;
+            renderBoard();
+          }, 1000);
+        }
+      }
+      renderBoard();
+    }
+
+    renderBoard();
+  </script>
+
+  <a href="#" onclick="localStorage.clear(); location.reload();">Gérer mes cookies 🍪</a>
+</body>
+</html>
