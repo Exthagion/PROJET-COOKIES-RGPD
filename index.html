@@ -8,7 +8,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Comic Sans MS', cursive;
-      background-image: url('https://i.gifer.com/H5z.gif');
+      background-image: url('https://assets.afcdn.com/recipe/20190529/93153_w600.jpg');
       background-size: cover;
       color: #fff;
       text-align: center;
@@ -63,15 +63,20 @@
       border-top: 4px dashed magenta;
       padding: 20px;
       display: none;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
       font-family: 'Comic Sans MS', cursive;
       color: black;
       z-index: 1000;
     }
 
+    .cookie-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
     .cookie-buttons button {
-      margin-left: 10px;
       padding: 10px 15px;
       border: 2px solid purple;
       border-radius: 10px;
@@ -103,17 +108,52 @@
       cursor: pointer;
       user-select: none;
     }
+
+    #newsletter-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: #ffccff;
+      color: #000;
+      font-size: 18px;
+      padding: 10px;
+      border-bottom: 3px dashed magenta;
+      z-index: 999;
+    }
+
+    .footer-links {
+      margin-top: 20px;
+    }
+
+    .footer-links a {
+      color: white;
+      font-weight: bold;
+      margin: 10px;
+      display: inline-block;
+      text-decoration: underline;
+    }
+
+    .footer-links a:hover {
+      color: yellow;
+    }
   </style>
 </head>
 <body>
 
-  <div class="logo">DOUCEUR</div>
+  <div id="newsletter-banner">
+    Souscrivez à notre newsletter magique ✨
+    <button onclick="subscribeNewsletter()">Souscrire</button>
+    <button onclick="unsubscribeNewsletter()">Se désabonner</button>
+  </div>
+
+  <div class="logo">D-O-U-C-E-U-R</div>
   <div class="welcome-message">Bienvenue aux douceurs qui correspondent au RGPD 💖🍪</div>
 
   <div class="gif-container">
-    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="chat rigolo">
-    <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif" alt="chat scintillant">
-    <img src="https://media.giphy.com/media/13borq7Zo2kulO/giphy.gif" alt="chat arc-en-ciel">
+    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJ5b21xbGVjN3BscmNoMm5maWZqMTc2MXZ6ODdibDBseWkybG12eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l41YnXY2uEOf37CMM/giphy.gif">
+    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJ5b21xbGVjN3BscmNoMm5maWZqMTc2MXZ6ODdibDBseWkybG12eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ptKqEC4VYVtWhmjQIF/giphy.gif">
+    <img src="https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3em0wZGVnM2RhZHZmcWgxOHc5d3I4Zm9zMzk0bmczODNhMXZicTF1ZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3owyplPY9gVLqBsXHW/giphy.gif">
   </div>
 
   <audio controls autoplay loop>
@@ -124,53 +164,60 @@
   <div id="game-board"></div>
 
   <div id="cookie-banner">
-    <p>🌈 Salut ! On utilise des cookies pour améliorer ton expérience. Accepte-les ou personnalise tes choix !</p>
-    <div class="cookie-buttons">
-      <button onclick="setCookieConsent('accepted')">🍪 Accepter</button>
-      <button onclick="setCookieConsent('refused')">🙅‍♀️ Refuser</button>
-      <button onclick="document.getElementById('cookie-preferences').style.display = 'flex'">🔧 Personnaliser</button>
-    </div>
-  </div>
-
-  <div id="cookie-preferences">
-    <p><strong>Préférences cookies :</strong></p>
+    <p>🌈 Salut ! On utilise des cookies pour améliorer ton expérience. Tu peux accepter ou refuser les cookies ci-dessous.</p>
     <ul>
       <li><input type="checkbox" checked disabled> Cookies nécessaires (toujours actifs)</li>
       <li><input type="checkbox" id="analytics"> Cookies de mesure d’audience</li>
       <li><input type="checkbox" id="ads"> Cookies publicitaires</li>
-      <li><input type="checkbox" id="social"> Cookies de réseaux sociaux</li>
+      <li><input type="checkbox" id="social"> Cookies de personnalisation</li>
+      <li><input type="checkbox" id="performance"> Cookies de performance</li>
     </ul>
     <div class="cookie-buttons">
-      <button onclick="savePreferences()">Enregistrer</button>
-      <button onclick="document.getElementById('cookie-preferences').style.display = 'none'">Fermer</button>
+      <button onclick="setCookieConsent('accepted')">🍪 Accepter tous les cookies</button>
+      <button onclick="setCookieConsent('refused')">🙅‍♀️ Refuser tous les cookies facultatifs</button>
+      <button onclick="saveCustomPreferences()">💾 Enregistrer mes choix</button>
     </div>
   </div>
 
   <script>
     const banner = document.getElementById('cookie-banner');
-    const preferences = document.getElementById('cookie-preferences');
 
     function setCookieConsent(value) {
+      const allPreferences = {
+        analytics: value === 'accepted',
+        ads: value === 'accepted',
+        social: value === 'accepted',
+        performance: value === 'accepted'
+      };
+      localStorage.setItem('cookie_preferences', JSON.stringify(allPreferences));
       localStorage.setItem('cookie_consent', value);
       banner.style.display = 'none';
     }
 
-    function savePreferences() {
-      const settings = {
+    function saveCustomPreferences() {
+      const preferences = {
         analytics: document.getElementById('analytics').checked,
         ads: document.getElementById('ads').checked,
-        social: document.getElementById('social').checked
+        social: document.getElementById('social').checked,
+        performance: document.getElementById('performance').checked
       };
-      localStorage.setItem('cookie_preferences', JSON.stringify(settings));
-      preferences.style.display = 'none';
+      localStorage.setItem('cookie_preferences', JSON.stringify(preferences));
+      localStorage.setItem('cookie_consent', 'custom');
       banner.style.display = 'none';
     }
 
-    if (!localStorage.getItem('cookie_consent') && !localStorage.getItem('cookie_preferences')) {
+    if (!localStorage.getItem('cookie_consent')) {
       banner.style.display = 'flex';
     }
 
-    // Jeu de mémoire : trouver les paires
+    function subscribeNewsletter() {
+      alert("Merci ! Vous êtes inscrit(e) à notre newsletter (hypothétiquement parlant 😉). Ceci nécessite une vérification côté base de données.");
+    }
+
+    function unsubscribeNewsletter() {
+      alert("Vous êtes désabonné(e) de notre newsletter. À bientôt 📨");
+    }
+
     const board = document.getElementById('game-board');
     let numbers = [];
     while (numbers.length < 5) {
@@ -207,7 +254,7 @@
           firstCard.matched = secondCard.matched = true;
           matchedCount++;
           firstCard = secondCard = null;
-          if (matchedCount === 5) alert('🎉 Bravo ! Toutes les paires sont trouvées !');
+          if (matchedCount === 5) alert('🎉 Bravo ! Toutes les paires sont trouvées ! Tu as gagné le droit de te faire collecter légalement tes données !');
         } else {
           setTimeout(() => {
             firstCard.revealed = secondCard.revealed = false;
@@ -222,6 +269,10 @@
     renderBoard();
   </script>
 
-  <a href="#" onclick="localStorage.clear(); location.reload();">Gérer mes cookies 🍪</a>
+  <div class="footer-links">
+    <a href="#" onclick="localStorage.clear(); location.reload();">Gérer mes cookies 🍪</a>
+    <a href="mentionslegales.html">Lien vers nos conditions d'utilisation et mentions légales</a>
+  </div>
+
 </body>
 </html>
