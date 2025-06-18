@@ -69,14 +69,8 @@
       z-index: 1000;
     }
 
-    .cookie-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
     .cookie-buttons button {
+      margin: 5px;
       padding: 10px 15px;
       border: 2px solid purple;
       border-radius: 10px;
@@ -122,20 +116,64 @@
       z-index: 999;
     }
 
-    .footer-links {
-      margin-top: 20px;
-    }
-
-    .footer-links a {
+    /* Slogan */
+    .slogan-banner {
+      margin: 30px auto;
+      background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+      padding: 20px;
+      border-radius: 15px;
+      border: 3px dashed white;
       color: white;
+      font-size: 28px;
       font-weight: bold;
-      margin: 10px;
-      display: inline-block;
-      text-decoration: underline;
+      position: relative;
     }
 
-    .footer-links a:hover {
-      color: yellow;
+    .slogan-banner::before, .slogan-banner::after {
+      content: '🍪🌈';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 30px;
+    }
+
+    .slogan-banner::before {
+      left: 20px;
+    }
+
+    .slogan-banner::after {
+      right: 20px;
+    }
+
+    /* Fiches produits */
+    .cookie-section {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 50px auto;
+      flex-wrap: wrap;
+    }
+
+    .cookie-box {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #000;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 280px;
+      border: 4px dotted pink;
+      box-shadow: 0 0 10px rgba(255, 192, 203, 0.8);
+      text-align: left;
+      font-size: 16px;
+    }
+
+    .cookie-box h3 {
+      color: #c71585;
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .cookie-box p {
+      margin: 10px 0 0 0;
     }
   </style>
 </head>
@@ -149,6 +187,27 @@
 
   <div class="logo">D-O-U-C-E-U-R</div>
   <div class="welcome-message">Bienvenue aux douceurs qui correspondent au RGPD 💖🍪</div>
+
+  <!-- Slogan RGPD -->
+  <div class="slogan-banner">
+    Recette Généreuse et Pleine de Douceur (RGPD)
+  </div>
+
+  <!-- Fiches cookies -->
+  <div class="cookie-section">
+    <div class="cookie-box">
+      <h3>Caresse des îles</h3>
+      <p>Un cookie tendre comme un hamac, avec une noix de coco qui pense qu’elle est en lune de miel avec une mangue timide. À consommer pieds nus dans l’herbe.</p>
+    </div>
+    <div class="cookie-box">
+      <h3>Martiniquaise</h3>
+      <p>Une recette qui chante le zouk tout en sortant du four. Banane rôtie, épices douces et petite touche de rhum — sans l’effet secondaire, promis.</p>
+    </div>
+    <div class="cookie-box">
+      <h3>Cookie beurré au beurre pur beurre</h3>
+      <p>Ce cookie n’a pas juste du beurre. Il EST du beurre, réincarné en forme ronde. Trop de beurre ? Impossible. Il est plus breton que la pluie.</p>
+    </div>
+  </div>
 
   <div class="gif-container">
     <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJ5b21xbGVjN3BscmNoMm5maWZqMTc2MXZ6ODdibDBseWkybG12eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l41YnXY2uEOf37CMM/giphy.gif">
@@ -170,12 +229,10 @@
       <li><input type="checkbox" id="analytics"> Cookies de mesure d’audience</li>
       <li><input type="checkbox" id="ads"> Cookies publicitaires</li>
       <li><input type="checkbox" id="social"> Cookies de personnalisation</li>
-      <li><input type="checkbox" id="performance"> Cookies de performance</li>
     </ul>
     <div class="cookie-buttons">
       <button onclick="setCookieConsent('accepted')">🍪 Accepter tous les cookies</button>
       <button onclick="setCookieConsent('refused')">🙅‍♀️ Refuser tous les cookies facultatifs</button>
-      <button onclick="saveCustomPreferences()">💾 Enregistrer mes choix</button>
     </div>
   </div>
 
@@ -183,26 +240,23 @@
     const banner = document.getElementById('cookie-banner');
 
     function setCookieConsent(value) {
-      const allPreferences = {
-        analytics: value === 'accepted',
-        ads: value === 'accepted',
-        social: value === 'accepted',
-        performance: value === 'accepted'
-      };
-      localStorage.setItem('cookie_preferences', JSON.stringify(allPreferences));
-      localStorage.setItem('cookie_consent', value);
-      banner.style.display = 'none';
-    }
-
-    function saveCustomPreferences() {
-      const preferences = {
-        analytics: document.getElementById('analytics').checked,
-        ads: document.getElementById('ads').checked,
-        social: document.getElementById('social').checked,
-        performance: document.getElementById('performance').checked
-      };
-      localStorage.setItem('cookie_preferences', JSON.stringify(preferences));
-      localStorage.setItem('cookie_consent', 'custom');
+      if (value === 'accepted') {
+        const settings = {
+          analytics: true,
+          ads: true,
+          social: true
+        };
+        localStorage.setItem('cookie_preferences', JSON.stringify(settings));
+        localStorage.setItem('cookie_consent', 'accepted');
+      } else {
+        const settings = {
+          analytics: false,
+          ads: false,
+          social: false
+        };
+        localStorage.setItem('cookie_preferences', JSON.stringify(settings));
+        localStorage.setItem('cookie_consent', 'refused');
+      }
       banner.style.display = 'none';
     }
 
@@ -218,6 +272,7 @@
       alert("Vous êtes désabonné(e) de notre newsletter. À bientôt 📨");
     }
 
+    // Jeu de mémoire : trouver les paires
     const board = document.getElementById('game-board');
     let numbers = [];
     while (numbers.length < 5) {
@@ -254,7 +309,7 @@
           firstCard.matched = secondCard.matched = true;
           matchedCount++;
           firstCard = secondCard = null;
-          if (matchedCount === 5) alert('🎉 Bravo ! Toutes les paires sont trouvées ! Tu as gagné le droit de te faire collecter légalement tes données !');
+          if (matchedCount === 5) alert('🎉 Bravo ! Toutes les paires sont trouvées ! Tu as gagné le droit de te faire collecter légalement tes données');
         } else {
           setTimeout(() => {
             firstCard.revealed = secondCard.revealed = false;
@@ -269,11 +324,10 @@
     renderBoard();
   </script>
 
-  <div class="footer-links">
-    <a href="#" onclick="localStorage.clear(); location.reload();">Gérer mes cookies 🍪</a>
-    <a href="mentionslegales.html">Lien vers nos conditions d'utilisation et mentions légales</a>
-    <a href="aproposdenous.html">A propos de nous</a>
-  </div>
-
+  <a href="#" onclick="localStorage.clear(); location.reload();">Gérer mes cookies 🍪</a>
+   <footer style="margin-top: 80px; padding: 20px; background-color: rgba(255,255,255,0.8); color: black; font-size: 14px;">
+    <a href="aproposdenous.html" style="margin-right: 20px; color: #c71585; text-decoration: underline;">À propos de nous</a>
+    <a href="mentionslegales.html" style="color: #c71585; text-decoration: underline;">Mentions légales & Conditions d'utilisation</a>
+  </footer>
 </body>
 </html>
